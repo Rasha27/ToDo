@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <input type="text" id="taskInput" placeholder="Add a task...">
+        <button onclick="addTask()">Add</button>
+        <ul id="taskList"></ul>
+    </div>
+    <script>
+        function addTask() {
+            const taskInput = document.getElementById('taskInput').value;
+            fetch('/api/tasks/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'task': taskInput
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchTasks();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function fetchTasks() {
+            fetch('/api/tasks')
+            .then(response => response.json())
+            .then(data => {
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+                data.tasks.forEach(task => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = task.task;
+                    taskList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        fetchTasks();
+    </script>
+</body>
+</html>
